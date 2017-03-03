@@ -1,0 +1,26 @@
+{
+  "name": "web-sockets-sample",
+  "description": "",
+  "main": "",
+  "authors": [
+    "Jiri Bruchanov <jbruchanov@gmail.com>"
+  ],
+  "license": "MIT",
+  "homepage": "",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "materialize": "0.98.0",
+    "requirejs": "^2.3.3",
+    "jquery-ui": "^1.12.1",
+    "eventEmitter": "^5.1.0",
+    "es6-promise": "^4.0.5",
+    "backbone": "^1.3.3",
+    "lodash": "^4.17.4"
+  }
+}

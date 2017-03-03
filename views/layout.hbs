@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{title}}</title>
+    <link rel='stylesheet' href='/stylesheets/_bower.css'/>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="/js/_bower.js"></script>
+    <script src="/js/_app.js"></script>
+</head>
+<style>
+    html, body {
+        height: 100vh;
+        overflow: hidden;
+    }
+</style>
+<script>
+    $(document).ready(function () {
+        $('select').material_select();
+        $('.modal').modal();
+    });
+</script>
+<header>
+    <nav>
+        <div class="nav-wrapper deep-purple darken-4">
+            <span class="brand-logo" style="margin-left:10px;">WebSocketChat</span>
+            <ul id="nav-mobile" class="right hide-on-med-and-down">
+                <li><a href="chat">Chat</a></li>
+            </ul>
+        </div>
+    </nav>
+</header>
+{{{body}}}
+</html>

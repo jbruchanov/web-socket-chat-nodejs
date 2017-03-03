@@ -1,0 +1,153 @@
+<style>
+    header {
+        position: relative;
+        z-index: 1;
+    }
+
+    .msg-input-row {
+        padding: 0px 10px;
+    }
+
+    #msg-input-text {
+        width: calc(100% - (60px));
+    }
+
+    #msg-input-send {
+        vertical-align: text-top;
+        margin-left: 10px;
+    }
+
+    .chat-footer {
+        box-shadow: 10px 10px;
+        height: 67px;
+    }
+
+    .chat-section {
+        height: calc(100% - (64px + 67px));
+    }
+
+    #chat-panel {
+        overflow-y: scroll;
+        width: calc(100% - (200px));
+        height: calc(100vh - (64px + 48px + 67px));
+    }
+
+    #chat-panel-private{
+        overflow-y: scroll;
+        width: 100%;
+        height: calc(100vh - (64px + 48px + 67px));
+    }
+
+    #chat-users {
+        overflow-y: scroll;
+        width:200px;
+        height: calc(100vh - (64px + 48px + 67px));
+    }
+
+    ::-webkit-scrollbar {
+        width: 7px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background-color: #dadada;
+    }
+
+    /* the new scrollbar will have a flat appearance with the set background color */
+
+    ::-webkit-scrollbar-thumb {
+        background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    /* this will style the thumb, ignoring the track */
+
+    ::-webkit-scrollbar-button {
+        background-color: #7c7c7c;
+    }
+
+    /* optionally, you can style the top and the bottom buttons (left and right for horizontal bars) */
+
+    ::-webkit-scrollbar-corner {
+        background-color: black;
+    }
+
+    .msg-time {
+        font-size: 0.75em;
+        vertical-align: middle;
+    }
+
+    .user-own {
+        font-weight: bold;
+    }
+
+</style>
+<section class="chat-section" data-controller="ChatController">
+    <nav id="tab-panel" class="nav-extended deep-purple darken-3">
+        <div class="nav-content" >
+            <ul id="tab-panel-view" class="tabs tabs-transparent">
+                <!--<li class="tab"><a href="#chat-tab-panel-main">Main</a></li>-->
+                <!--<li class="tab"><a href="#chat-tab-panel-XABC">XABC</a></li>-->
+            </ul>
+        </div>
+    </nav>
+    <script id="template-chat-panel-main" type="text/xhtml">
+        <div id="chat-tab-panel-Main" class="col s12">
+            <div class="row">
+                <div id="chat-panel" class="col">
+                    <ul id="chat-panel-list" class="collection chat-panel-list">
+                        {{#times 0}}
+                            <li class="collection-item">
+                                <b class="title">Title</b>&nbsp;<i class="msg-time">(2017-01-01 15:42:12)</i><br>
+                                First Line
+                            </li>
+                        {{/times}}
+                    </ul>
+                </div>
+                <div id="chat-users" class="col">
+                    <ul id="chat-users-list" class="collection chat-panel-list">
+                        {{#times 0}}
+                            <li class="collection-item">Alvin</li>
+                        {{/times}}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </script>
+    <script id="template-chat-panel-private" type="text/xhtml">
+        <div id="chat-tab-panel-<%= username_hash %>" class="col s12">
+            <div class="row grey lighten-5">
+                <div id="chat-panel-private" class="col s12">
+                    <ul id="chat-panel-private-list-<%= username_hash %>" class="collection chat-panel-list">
+                        {{#times 0}}
+                            <li class="collection-item">
+                                <b class="title">Title</b>&nbsp;<i class="msg-time">(2017-01-01 15:42:12)</i><br>
+                                First Line
+                            </li>
+                        {{/times}}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </script>
+    <!-- Modal Structure -->
+    <div id="modal1" class="modal">
+        <div class="modal-content">
+            <div class="row input-field">
+                <input id="username" type="text" class="validate">
+                <label for="username" data-error="Empty username">Username</label>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <a id="username_ok" href="#!"
+               class="modal-action modal-close waves-effect waves-green btn-flat disabled">OK</a>
+        </div>
+    </div>
+</section>
+<footer class="chat-footer">
+    <div style="height: 1px; background-color: black"></div>
+    <div class="msg-input-row blue-grey lighten-5">
+        <input id="msg-input-text" type="text"/>
+        <button id="msg-input-send" class="btn-floating waves-effect waves-light">
+            <i class="material-icons">send</i>
+        </button>
+    </div>
+</footer>
