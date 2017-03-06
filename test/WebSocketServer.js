@@ -10,22 +10,26 @@ const AssertionError = require('assertion-error');
 const Promise = require("promise");
 const WebSocketServer = require(process.cwd() + "/src/WebSocketServer");
 
+const express = require('express');
 const assert = require('chai').assert;
-const ws = require("nodejs-websocket");
+const WebSocket = require("ws");
+const http = require('http');
 const joker = require(process.cwd() + "/test/Joker");
 
 describe('WebSocketServer', function () {
     var webSocketServer;
-
+    var server;
     //noinspection ES6ModulesDependencies,NodeModulesDependencies
     beforeEach(function () {
-        webSocketServer = new WebSocketServer(PORT);
+        server = http.createServer(express());
+        server.listen(PORT);
+        webSocketServer = new WebSocketServer({server});
     });
 
     afterEach(function () {
         try {
-            webSocketServer.stop();
-            webSocketServer = null;
+            server.close();
+            server = null;
         } catch (e) {
             console.error(e);
         }
@@ -44,28 +48,18 @@ describe('WebSocketServer', function () {
         assert.throws(() => webSocketServer.on('msg'), AssertionError);
     });
 
-    it('Starts server', function (done) {
-        webSocketServer.start()
-            .then(() => {
-                let conn = ws.connect(WS_URL, (args) => {
-                    conn.close();
-                    done();
-                });
-            });
-    });
-
     it('Login saves connection', function (done) {
         const username = "test_username";
-        webSocketServer.start();
         var loginHandledPromise = new Promise((resolve) => {
             webSocketServer.on('login', () => resolve());
         });
 
         new Promise((resolve) => {
-            let conn = ws.connect(WS_URL, () => resolve(conn));
+            const ws = new WebSocket(`ws://localhost:${PORT}/`);
+            ws.on('open', () => resolve(ws));
         }).then((conn) => {
             let loginSentPromise = new Promise(function (resolve) {
-                conn.sendText(JSON.stringify({type: "login", username: username}), () => resolve(conn));
+                conn.send(JSON.stringify({type: "login", username: username}), () => resolve(conn));
             });
             return Promise.all([loginHandledPromise, loginSentPromise]);
         }).then((results) => {
@@ -77,7 +71,6 @@ describe('WebSocketServer', function () {
             assert.strictEqual(clientConn.key, serverConns[0].key);
 
             clientConn.close();
-            webSocketServer.stop();
             done();
         }).catch((e) => {
             console.error(e);
@@ -87,7 +80,7 @@ describe('WebSocketServer', function () {
 
     it('Logout clears connection', function (done) {
         const username = "test_username";
-        webSocketServer.start();
+
         var loginHandledPromise = new Promise((resolve) => {
             webSocketServer.on('login', () => resolve());
         });
@@ -96,15 +89,17 @@ describe('WebSocketServer', function () {
         });
         var conn = null;
         new Promise((resolve) => {
-            conn = ws.connect(WS_URL, () => resolve(conn));
+            const ws = new WebSocket(`ws://localhost:${PORT}/`);
+            ws.on('open', () => resolve(ws));
         }).then((result) => {
+            conn = result;
             let loginSentPromise = new Promise(function (resolve) {
-                conn.sendText(JSON.stringify({type: "login", username: username}), () => resolve(conn));
+                conn.send(JSON.stringify({type: "login", username: username}), () => resolve(conn));
             });
             return Promise.all([loginHandledPromise, loginSentPromise]);
         }).then((results) => {
             let logoutSentPromise = new Promise(function (resolve) {
-                conn.sendText(JSON.stringify({type: "logout"}), () => resolve(conn));
+                conn.send(JSON.stringify({type: "logout"}), () => resolve(conn));
             });
             return Promise.all([logoutHandledPromise, logoutSentPromise]);
         }).then((results) => {
@@ -113,7 +108,6 @@ describe('WebSocketServer', function () {
             assert.isNotArray(serverConns);//undefined
 
             conn.close();
-            webSocketServer.stop();
             done();
         }).catch((e) => {
             console.error(e);
@@ -228,7 +222,7 @@ class FakeConnection {
         this.socket = joker;
     }
     on(event, callback) { this._on.push({event: event, callback: callback}); }
-    sendText(msg){ this._sendText.push(msg); }
+    send(msg){ this._sendText.push(msg); }
     filterSendText(type) {
         return _.filter(this._sendText, (msg) => type == undefined || JSON.parse(msg).type === type);
     }

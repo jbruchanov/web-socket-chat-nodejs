@@ -42,7 +42,6 @@ app.use(function (err, req, res, next) {
     res.render('error');
 });
 
-require('./src/WebSocketServer.js').start();
 hbs.registerHelper('noop', function (options) {
     return options.fn(this);
 });

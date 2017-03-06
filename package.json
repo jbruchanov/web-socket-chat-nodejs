@@ -19,9 +19,9 @@
     "helmet": "3.4.1",
     "lodash": "4.17.4",
     "morgan": "~1.7.0",
-    "nodejs-websocket": "^1.7.1",
     "promise": "7.1.1",
-    "serve-favicon": "~2.3.2"
+    "serve-favicon": "~2.3.2",
+    "ws": "2.2.0"
   },
   "devDependencies": {
     "assertion-error": "1.0.2",

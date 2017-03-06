@@ -3,7 +3,7 @@
  */
 "use strict";
 
-const ws = require("nodejs-websocket");
+const SocketServer = require('ws').Server;
 const _ = require('lodash');
 const assert = require('chai').assert;
 const Promise = require('promise');
@@ -15,32 +15,28 @@ module.exports = class WebSocketServer extends EventEmitter {
      *
      * @param port
      */
-    constructor(port) {
+    constructor(args) {
         super();
-        port = port || 3001;
-        assert.isNumber(port);
-        assert.isAbove(port, 0);
-        assert.isBelow(port, 65536);
+        assert.isOk(args);
         this._userConnections = {};
-        this._port = port;
-        this._server = this._onCreateServer();
         this._msgs = [];
-    }
-
-    _onCreateServer() {
-        return ws.createServer((conn) => this.onNewConnection(conn));
+        const wss = new SocketServer(args);
+        this._server = wss;
+        wss.on('connection', (ws) => {
+            this.onNewConnection(ws);
+        });
+        console.log("Starting WebSocketServer");
     }
 
     /**
      *
-     * @param conn
+     * @param socket
      */
-    onNewConnection(conn) {
-        conn.on("text", (msg) => this.onNewMessage(msg, conn));
-        let removeConnection = () => this.onLogout(conn);
-        conn.on("close", removeConnection);
-        conn.on("error", removeConnection);
-        conn.socket.on('error', removeConnection);
+    onNewConnection(socket) {
+        socket.on("message", (msg) => this.onNewMessage(msg, socket));
+        let removeConnection = () => this.onLogout(socket);
+        socket.on("close", removeConnection);
+        socket.on("error", removeConnection);
     }
 
     /**
@@ -60,7 +56,7 @@ module.exports = class WebSocketServer extends EventEmitter {
                     this._userConnections[username] = this._userConnections[username] || [];
                     this._userConnections[username].push(conn);
                     this.sendBroadcast(JSON.stringify({type:"users", data:Object.keys(this._userConnections)}));
-                    conn.sendText(JSON.stringify({type: "msgs", data: this._msgs}));
+                    conn.send(JSON.stringify({type: "msgs", data: this._msgs}));
                 }
                     break;
                 case 'logout': {
@@ -79,7 +75,7 @@ module.exports = class WebSocketServer extends EventEmitter {
                         //send to particular user
                         _.each(this._userConnections[to], (clientConn) => {
                             if (clientConn !== conn) {
-                                clientConn.sendText(msg);
+                                clientConn.send(msg);
                             }
                         });
                     } else {
@@ -119,7 +115,7 @@ module.exports = class WebSocketServer extends EventEmitter {
         _.each(this._userConnections, (clientConns) => {
             _.each(clientConns, (clientConn) => {
                 if (clientConn !== excludeConn) {
-                    clientConn.sendText(msg);
+                    clientConn.send(msg);
                 }
             });
         });
@@ -127,20 +123,6 @@ module.exports = class WebSocketServer extends EventEmitter {
 
     notify(event, data) {
         this.emit(event, {event: event, data: data});
-    }
-
-    start() {
-        return new Promise((resolve, reject) => {
-            this._server.listen(this._port, function () {
-                resolve(this);
-            });
-        });
-    }
-
-    stop() {
-        this._userConnections = {};
-        this._server.close();
-        return this;
     }
 
     /**
@@ -167,9 +149,5 @@ module.exports = class WebSocketServer extends EventEmitter {
 
     _now() {
         return new Date();
-    }
-
-    static start() {
-        return new WebSocketServer().start();
     }
 };
