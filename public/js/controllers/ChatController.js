@@ -223,8 +223,9 @@ define(["controllers/_BaseController", "WebSocketClient"], (BaseController, WebS
         constructor() {
             super();
             this._headerFooterSize = 0;
-            var port = window.location.port || 80;
-            let url = `ws://${window.location.hostname}:${port}`;
+            const proto = window.location.protocol.startsWith("https") ? "wss" : "ws";
+            var port = window.location.port || ("wss" == proto ? "443" : "80");
+            let url = `${proto}://${window.location.hostname}:${port}`;
             this._webSocketClient = new WebSocketClient(url);
             // this._usersView = new UsersView({el: $("#chat-users-list"), eventEmitter: this});
             // this._messagesView = new MessagesView({el: $("#chat-panel-list")});
