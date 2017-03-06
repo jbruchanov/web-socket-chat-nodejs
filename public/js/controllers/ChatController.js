@@ -223,7 +223,8 @@ define(["controllers/_BaseController", "WebSocketClient"], (BaseController, WebS
         constructor() {
             super();
             this._headerFooterSize = 0;
-            this._webSocketClient = new WebSocketClient("ws://127.0.0.1:3001");
+            let url = `ws://${window.location.hostname}:3001`;
+            this._webSocketClient = new WebSocketClient(url);
             // this._usersView = new UsersView({el: $("#chat-users-list"), eventEmitter: this});
             // this._messagesView = new MessagesView({el: $("#chat-panel-list")});
 
