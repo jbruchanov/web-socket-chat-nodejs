@@ -223,6 +223,7 @@ define(["controllers/_BaseController", "WebSocketClient"], (BaseController, WebS
         constructor() {
             super();
             this._headerFooterSize = 0;
+            var port = window.location.port || 80;
             let url = `ws://${window.location.hostname}:${window.location.port}`;
             this._webSocketClient = new WebSocketClient(url);
             // this._usersView = new UsersView({el: $("#chat-users-list"), eventEmitter: this});
