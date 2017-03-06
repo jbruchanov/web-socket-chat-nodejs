@@ -7,5 +7,4 @@ module.exports = (app) => {
     app.use('/', require('./index'));
     app.use('/users', require('./users'));
     app.use('/chat', require('./chat'));
-    app.use('/form', require('./form'));
 };
