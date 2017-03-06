@@ -17,6 +17,7 @@
     "express": "~4.14.1",
     "hbs": "~4.0.1",
     "helmet": "3.4.1",
+    "lodash": "4.17.4",
     "morgan": "~1.7.0",
     "nodejs-websocket": "^1.7.1",
     "promise": "7.1.1",
