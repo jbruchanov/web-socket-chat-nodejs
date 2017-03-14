@@ -354,13 +354,26 @@ define(["controllers/_BaseController", "WebSocketClient"], (BaseController, WebS
             unameEl.change(event);
         }
 
-        sendMessage(msg) {
-            var user = this._tabPanelView.getSelectedUser();
-            let to = user ? user.get('username') : void 0;
-            let sentMsg = this._webSocketClient.sendMessage(msg, this._username, to);
-            if (sentMsg) {
-                this.onMessage(sentMsg, false, to);
-                this._msgText.empty();
+        sendMessage(msg, reconnectOnError) {
+            try {
+                var user = this._tabPanelView.getSelectedUser();
+                let to = user ? user.get('username') : void 0;
+                let sentMsg = this._webSocketClient.sendMessage(msg, this._username, to);
+                if (sentMsg) {
+                    this.onMessage(sentMsg, false, to);
+                    this._msgText.empty();
+                }
+            } catch (e) {
+                if (reconnectOnError !== false) {
+                    this._webSocketClient
+                        .connect()
+                        .then(() => {
+                            this._webSocketClient.login(this._username);
+                        })
+                        .then(() => {
+                            this.sendMessage(msg, false);
+                        }).catch((e) => alert(e));
+                }
             }
         }
 

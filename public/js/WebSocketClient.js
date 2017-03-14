@@ -15,7 +15,7 @@ define(() => {
         connect() {
             this.close();
             return new Promise((resolve, reject) => {
-                this._webSocket = this._onCreateWebSocket(this._url, resolve);
+                this._webSocket = this._onCreateWebSocket(this._url, resolve, reject);
             });
         }
 
@@ -35,14 +35,13 @@ define(() => {
         }
 
         sendMessage(msg, from, to) {
-            try {
-                let value = {type: "msg", data:msg, from:from, to:to};
-                this._webSocket.send(JSON.stringify(value));
-                value.received = new Date().toISOString();
-                return value;
-            } catch (e) {
-                console.error(e);
+            let value = {type: "msg", data:msg, from:from, to:to};
+            if (this._webSocket == null || this._webSocket.readyState != WebSocket.OPEN) {
+                throw new Error("Socket not connected");
             }
+            this._webSocket.send(JSON.stringify(value));
+            value.received = new Date().toISOString();
+            return value;
         }
 
         logout() {
@@ -60,6 +59,7 @@ define(() => {
             var webSocket = new WebSocket(url);
             webSocket.onerror = function (event) {
                 console.error(event);
+                reject("WebSocket Error");
             };
 
             webSocket.onopen = function (event) {
