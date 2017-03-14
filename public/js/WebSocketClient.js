@@ -68,6 +68,11 @@ define(() => {
                 resolve();
             };
 
+            webSocket.onclose = function (event) {
+                console.log("Closed");
+                this.connect();
+            };
+
             webSocket.onmessage = function (event) {
                 try {
                     var obj = JSON.parse(event.data);
